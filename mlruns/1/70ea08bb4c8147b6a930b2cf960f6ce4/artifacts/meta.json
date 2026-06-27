@@ -1,0 +1,43 @@
+{
+  "run_id": "70ea08bb4c8147b6a930b2cf960f6ce4",
+  "trained_at": "2026-06-27T14:00:46.955615",
+  "cv_mape": 0.078853,
+  "test_mape": 0.080621,
+  "features": [
+    "lag_7d",
+    "lag_14d",
+    "lag_21d",
+    "lag_28d",
+    "lag_35d",
+    "lag_42d",
+    "rolling_mean_7d",
+    "rolling_mean_14d",
+    "rolling_mean_28d",
+    "rolling_std_7d",
+    "rolling_std_14d",
+    "rolling_std_28d",
+    "dayofweek",
+    "dayofmonth",
+    "weekofyear",
+    "month",
+    "quarter",
+    "is_weekend",
+    "is_month_end",
+    "is_month_start",
+    "sin_week",
+    "cos_week",
+    "sin_year",
+    "cos_year",
+    "price",
+    "price_deviation",
+    "is_promo",
+    "days_of_cover",
+    "temperature",
+    "is_holiday",
+    "event_score"
+  ],
+  "weights": {
+    "lgbm": 0.6,
+    "prophet": 0.4
+  }
+}
