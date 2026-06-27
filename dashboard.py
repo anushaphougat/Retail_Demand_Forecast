@@ -44,7 +44,7 @@ health = check_health()
 if health:
     col1, col2, col3 = st.columns(3)
     col1.metric("API Status",     "🟢 Live")
-    col2.metric("Forecast Rows",  f"{health['forecast_rows']:,}")
+    col2.metric("Forecast Rows",  f"{health['forecast_rows',0]:,}")
     col3.metric("Model Loaded",   "✅ Yes" if health["model_loaded"] else "❌ No")
 else:
     st.error("❌ API is not reachable. Make sure the FastAPI server is running.")
