@@ -15,11 +15,10 @@ from datetime import date
 
 # ── Config ──────────────────────────────────────────────────────────────────
 
-API_URL = "http://127.0.0.1:8000"  # change to Render URL when deployed
+API_URL = "https://retail-demand-forecast.onrender.com/docs"
 
 STORES = [f"STORE_{i:03d}" for i in range(1, 11)]
 SKUS   = [f"SKU_{i:04d}"   for i in range(1, 51)]
-
 st.set_page_config(
     page_title="Retail Demand Forecast",
     page_icon="📦",
