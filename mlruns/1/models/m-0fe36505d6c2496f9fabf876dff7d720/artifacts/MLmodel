@@ -1,0 +1,27 @@
+artifact_path: file:C:/Users/anusha/OneDrive/Documents/Retail_Demand_Forecast/mlruns/1/models/m-0fe36505d6c2496f9fabf876dff7d720/artifacts
+flavors:
+  lightgbm:
+    code: null
+    data: model.skops
+    lgb_version: 4.6.0
+    model_class: lightgbm.sklearn.LGBMRegressor
+    serialization_format: skops
+    skops_trusted_types:
+    - lightgbm.sklearn.LGBMClassifier
+    - collections.OrderedDict
+    - lightgbm.basic.Booster
+    - lightgbm.sklearn.LGBMRegressor
+  python_function:
+    data: model.skops
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.lightgbm
+    python_version: 3.14.3
+mlflow_version: 3.14.0
+model_id: m-0fe36505d6c2496f9fabf876dff7d720
+model_size_bytes: 9624039
+model_uuid: m-0fe36505d6c2496f9fabf876dff7d720
+prompts: null
+run_id: 9c0c69e8cafa46759358fdb040a611a8
+utc_time_created: '2026-06-27 12:48:47.833765'
