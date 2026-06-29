@@ -1,6 +1,6 @@
 {
-  "run_id": "b1aa3d5804e9482c8e122d24f4160dea",
-  "trained_at": "2026-06-29T12:50:08.565931",
+  "run_id": "19a78806b36840f19a0e4fb49a2145c0",
+  "trained_at": "2026-06-29T15:45:09.225725",
   "cv_mape": 0.078853,
   "test_mape": 0.080621,
   "features": [
