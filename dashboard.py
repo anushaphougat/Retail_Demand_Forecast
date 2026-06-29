@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 
-API_URL = "https://retail-demand-forecast.onrender.com"
+API_URL = "https://retail-demand-forecast.onrender.com/docs"
 
 STORES = [f"STORE_{i:03d}" for i in range(1, 11)]
 SKUS   = [f"SKU_{i:04d}"   for i in range(1, 51)]
