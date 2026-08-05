@@ -103,6 +103,8 @@ Use `render.yaml` to deploy the FastAPI service:
 
 Use `vercel.json` to deploy the static dashboard from the `public/` directory.
 
+- Live demo: https://retail-demand-forecast-w1zk.vercel.app/
+
 ### GitHub Actions deployment
 
 A GitHub Actions workflow is included at `.github/workflows/deploy.yml`.
