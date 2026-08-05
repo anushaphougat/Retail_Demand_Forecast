@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "render-cli": "^0.3.2",
+    "vercel": "^58.5.1"
+  }
+}

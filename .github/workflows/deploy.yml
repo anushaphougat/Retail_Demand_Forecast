@@ -1,0 +1,48 @@
+name: Deploy dashboard and API
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-dashboard:
+    name: Deploy dashboard to Vercel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy dashboard
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          cd public
+          vercel deploy --prod --confirm --token "$VERCEL_TOKEN"
+
+  deploy-api:
+    name: Deploy API to Render
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install render CLI
+        run: curl -fsSL https://render.com/cli/install.sh | bash
+
+      - name: Deploy API
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        run: |
+          render deploy --service-id "$RENDER_SERVICE_ID" --wait

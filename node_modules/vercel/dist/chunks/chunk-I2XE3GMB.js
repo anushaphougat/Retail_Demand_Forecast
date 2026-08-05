@@ -1,0 +1,21 @@
+import { createRequire as __createRequire } from 'node:module';
+import { fileURLToPath as __fileURLToPath } from 'node:url';
+import { dirname as __dirname_ } from 'node:path';
+const require = __createRequire(import.meta.url);
+const __filename = __fileURLToPath(import.meta.url);
+const __dirname = __dirname_(__filename);
+
+// src/util/output/progress.ts
+function progress(current, total, opts = {}) {
+  const { width = 20, complete = "=", incomplete = "-" } = opts;
+  if (total <= 0 || current < 0 || current > total) {
+    return null;
+  }
+  const unit = total / width;
+  const pos = Math.floor(current / unit);
+  return `${complete.repeat(pos)}${incomplete.repeat(width - pos)}`;
+}
+
+export {
+  progress
+};
