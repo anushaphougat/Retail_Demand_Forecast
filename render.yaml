@@ -1,0 +1,12 @@
+services:
+  - type: web_service
+    name: retail-demand-forecast-api
+    env: docker
+    repo: https://github.com/anushaphougat/Retail_Demand_Forecast
+    branch: main
+    dockerfilePath: docker/Dockerfile.api
+    startCommand: uvicorn serving.api.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: MODEL_DIR
+        value: /app/models

@@ -1,183 +1,55 @@
-# Retail Demand Forecasting Platform
+﻿# Retail Demand Forecast
 
-Production-grade demand forecasting system for retail SKUs.
-Inspired by Amazon Seller Analytics.
-Live API link - https://retail-demand-forecast.onrender.com/docs
----
+This repository contains a retail demand forecasting API and a new static dashboard for forecast visualization.
 
-## Architecture
+## What was added
 
-```
-Data Sources → Ingestion → Feature Engineering → Model Training → Serving → Monitoring
-   (POS, ERP)   (Kafka/S3)    (Lag, Calendar)     (LightGBM+    (FastAPI   (MAPE +
-                                                    Ensemble)     + Redis)    Drift)
-```
+- `public/` — static dashboard site with forecast lookup and top movers views
+- `vercel.json` — Vercel configuration for deploying the dashboard as a static site
+- `render.yaml` — Render configuration for deploying the API service from `docker/Dockerfile.api`
+- `README.md` — deployment and usage instructions
 
-## Project Structure
+## Dashboard
 
-```
-retail-demand-forecasting/
-├── data/
-│   ├── generate_sample_data.py     # Synthetic data generator
-│   └── sample/                     # Generated CSVs and parquet files
-├── data_pipeline/
-│   ├── dags/
-│   │   └── forecast_dag.py         # Airflow nightly pipeline
-│   └── features/
-│       └── engineer.py             # Feature engineering module
-├── model_training/
-│   ├── trainer.py                  # LightGBM + ensemble training
-│   └── predictor.py                # Batch forecast generation
-├── serving/
-│   └── api/
-│       └── main.py                 # FastAPI REST service
-├── monitoring/
-│   └── monitor.py                  # MAPE tracking + drift detection
-├── docker/
-│   ├── docker-compose.yml          # Full stack (API, Redis, MLflow, Airflow)
-│   └── Dockerfile.api              # API container
-└── requirements.txt
-```
+The dashboard is a simple static site that calls your API backend.
 
----
+1. Deploy the API on Render using `render.yaml`.
+2. Deploy the dashboard on Vercel using `vercel.json`.
+3. Enter the Render service URL in the dashboard's `Backend API URL` field.
 
-## Quick Start (5 minutes)
+## Deployment
 
-### 1. Install dependencies
-```bash
-python -m venv .venv
-source .venv/bin/activate           # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
+### Render
 
-### 2. Generate sample data
-```bash
-python data/generate_sample_data.py
-# → data/sample/sales.csv       (10 stores × 50 SKUs × 3 years)
-# → data/sample/external.csv    (weather + holiday signals)
-```
+The API service is configured in `render.yaml`:
 
-### 3. Build feature matrix
-```bash
-python -m data_pipeline.features.engineer
-# → data/sample/features.parquet
-```
+- `type: web_service`
+- `env: docker`
+- `repo: https://github.com/anushaphougat/Retail_Demand_Forecast`
+- `branch: main`
+- `dockerfilePath: docker/Dockerfile.api`
+- `startCommand: uvicorn serving.api.main:app --host 0.0.0.0 --port $PORT`
 
-### 4. Train models
-```bash
-python -m model_training.trainer
-# → models/lgbm_model.pkl
-# → models/meta.json
-# → MLflow UI: http://localhost:5000
-```
+After connecting this repository on Render, the service should build and serve the API.
 
-### 5. Generate forecasts
-```bash
-python -m model_training.predictor
-# → data/sample/forecasts.parquet
-```
+### Vercel
 
-### 6. Start the API
-```bash
-uvicorn serving.api.main:app --reload --port 8000
-# → http://localhost:8000/docs
-```
+The dashboard is configured to deploy as a static site with `@vercel/static`.
 
-### 7. Test the API
-```bash
-# Single SKU forecast
-curl "http://localhost:8000/forecast/STORE_001/SKU_0001?horizon=14"
+If you connect this repository on Vercel, it will publish the site from the `public/` folder.
 
-# Health check
-curl "http://localhost:8000/health"
+## API endpoints used by the dashboard
 
-# Top movers
-curl "http://localhost:8000/forecast/top-movers/STORE_001"
-```
+- `GET /forecast/{store_id}/{sku_id}?horizon={days}`
+- `GET /forecast/top-movers/{store_id}?days=7`
 
----
+## Usage
 
-## Full Stack with Docker
+1. Deploy the API on Render.
+2. Deploy the dashboard on Vercel.
+3. Open the dashboard and paste your Render service URL into the `Backend API URL` field.
 
-```bash
-cd docker
-docker compose up -d
+## Notes
 
-# Services:
-#   Forecast API  → http://localhost:8000/docs
-#   Airflow       → http://localhost:8080  (admin/admin)
-#   MLflow        → http://localhost:5000
-#   Grafana       → http://localhost:3000  (admin/admin)
-#   Prometheus    → http://localhost:9090
-```
-
----
-
-## Run Monitoring
-
-```bash
-python -m monitoring.monitor
-# Outputs: rolling MAPE, feature drift PSI, Slack alert if threshold breached
-```
-
-Set `SLACK_WEBHOOK_URL` env var to receive real alerts.
-
----
-
-## API Reference
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Liveness + readiness check |
-| GET | `/forecast/{store}/{sku}?horizon=14` | Point forecast with 95% CI |
-| POST | `/forecast/batch` | Multi-SKU batch forecast |
-| GET | `/forecast/top-movers/{store}` | Top 10 SKUs by demand |
-| POST | `/retrain` | Trigger async retraining |
-| POST | `/cache/invalidate` | Flush Redis cache |
-
----
-
-## Model Details
-
-| Model | Use case | MAPE (typical) |
-|-------|----------|----------------|
-| LightGBM | Tabular features, fast inference | 8–14% |
-| Prophet | Strong weekly/yearly seasonality | 10–18% |
-| Ensemble | Weighted blend (60/40) | 7–12% |
-
-**Features used (30+):**
-- Lag sales: 7d, 14d, 21d, 28d, 35d, 42d
-- Rolling mean/std: 7d, 14d, 28d
-- Calendar: day of week, week of year, month, Fourier terms
-- Price + price deviation from rolling mean
-- Promotions flag
-- Days of cover (inventory)
-- External: temperature, holiday, event score
-
----
-
-## Production Checklist
-
-- [ ] Replace CSV sources with Kafka consumer / ERP API
-- [ ] Point Airflow to real DAG S3 bucket
-- [ ] Configure Redshift/BigQuery connection in feature store
-- [ ] Set `POSTGRES_DSN` for forecast output
-- [ ] Set `SLACK_WEBHOOK_URL` for alerts
-- [ ] Enable MLflow remote tracking (S3 artifact store)
-- [ ] Add Kubernetes HPA on the FastAPI deployment
-- [ ] Set up Grafana dashboard importing `docker/grafana_dashboard.json`
-- [ ] Configure AWS Secrets Manager / GCP Secret Manager for credentials
-
----
-
-## Portfolio Notes
-
-Each layer maps to a standalone GitHub project or notebook:
-
-1. **Data pipeline** → `retail-forecasting-pipeline` repo (Airflow + feature engineering)
-2. **Model training** → `demand-forecast-models` repo (LightGBM + Prophet + MLflow)
-3. **Serving** → `forecast-api` repo (FastAPI + Docker + Redis)
-4. **Monitoring** → notebook: "How to detect ML model drift in production"
-
-Skills demonstrated: time-series ML, feature engineering, MLOps, REST APIs,
-Redis caching, containerisation, monitoring, data drift detection.
+- No hard-coded deployment links are kept in this repository.
+- If you previously linked a GitHub Pages or repository deployment URL, remove it in GitHub repository settings.
