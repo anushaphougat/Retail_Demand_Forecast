@@ -8,21 +8,38 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <h1>Retail Demand Forecast Dashboard</h1>
-      <p>Interactive forecast viewer for your retail demand API.</p>
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Retail Intelligence</p>
+      <h1>Demand Forecast Dashboard</h1>
+      <p class="hero-description">Explore SKU-level demand forecasts, review top movers, and use the local API for reliable inventory planning.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card">
+        <span class="stat-value">FastAPI</span>
+        <span class="stat-label">Backend service</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">Static UI</span>
+        <span class="stat-label">Vercel-ready</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">Predictive</span>
+        <span class="stat-label">SKU demand insights</span>
+      </div>
     </div>
   </header>
 
-  <main>
-    <section class="panel">
-      <h2>Forecast lookup</h2>
+  <main class="dashboard-shell">
+    <section class="panel panel--elevated">
+      <div class="panel-heading">
+        <div>
+          <h2>Forecast Query</h2>
+          <p class="panel-description">Use the local API at <strong>http://127.0.0.1:8000</strong> to request SKU forecasts and top movers.</p>
+        </div>
+      </div>
+
       <div class="form-grid">
-        <label>
-          Backend API URL
-          <input id="apiUrl" type="url" placeholder="https://your-render-app.onrender.com" />
-        </label>
         <label>
           Store ID
           <input id="storeId" type="text" placeholder="store_123" />
@@ -36,53 +53,73 @@
           <input id="horizon" type="number" min="1" max="90" value="14" />
         </label>
       </div>
+
       <div class="actions">
         <button id="fetchForecast">Fetch Forecast</button>
-        <button id="fetchTopMovers">Top Movers</button>
+        <button id="fetchTopMovers">Fetch Top Movers</button>
       </div>
-      <div id="statusMessage" class="status">Enter your API URL and query values, then fetch a forecast.</div>
+
+      <div id="statusMessage" class="status">Checking local API connection automatically.</div>
     </section>
 
-    <section class="panel" id="forecastPanel" hidden>
-      <div class="section-header">
-        <h2>Forecast results</h2>
-        <div id="forecastSummary" class="summary"></div>
+    <section class="panel panel--split">
+      <div class="left-card panel--elevated">
+        <div class="section-header">
+          <h2>Forecast Results</h2>
+          <div id="forecastSummary" class="summary"></div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="forecastChart"></canvas>
+        </div>
       </div>
-      <canvas id="forecastChart" height="320"></canvas>
-      <table id="forecastTable" class="data-table" hidden>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Predicted Qty</th>
-            <th>Lower 95%</th>
-            <th>Upper 95%</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+
+      <div class="right-card panel--elevated">
+        <div class="section-header">
+          <h2>Forecast Table</h2>
+          <p class="summary">Detailed daily values for your selected SKU.</p>
+        </div>
+        <div class="table-container">
+          <table id="forecastTable" class="data-table" hidden>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Predicted Qty</th>
+                <th>Lower 95%</th>
+                <th>Upper 95%</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="forecastPlaceholder" class="placeholder">Forecast results appear here after a successful query.</div>
+        </div>
+      </div>
     </section>
 
-    <section class="panel" id="topMoversPanel" hidden>
+    <section class="panel panel--elevated" id="topMoversPanel" hidden>
       <div class="section-header">
         <h2>Top Movers</h2>
         <div id="topMoversSummary" class="summary"></div>
       </div>
-      <table id="topMoversTable" class="data-table">
-        <thead>
-          <tr>
-            <th>SKU ID</th>
-            <th>Total Forecasted Quantity</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="table-container">
+        <table id="topMoversTable" class="data-table">
+          <thead>
+            <tr>
+              <th>SKU ID</th>
+              <th>Total Forecasted Quantity</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p>Built for Retail Demand Forecast. Use a Render backend URL and deploy the dashboard as a static site on Vercel.</p>
+  <footer class="footer-bar">
+    <p>Local dashboard running with the built-in API endpoint. Use the controls to inspect demand forecasts and top movers.</p>
   </footer>
 
+  <!-- Optional runtime config: set window.API_BASE_URL_OVERRIDE to your deployed API URL -->
+  <script src="/runtime-config.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

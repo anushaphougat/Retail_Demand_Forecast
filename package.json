@@ -1,4 +1,10 @@
 {
+  "name": "retail-demand-forecast",
+  "version": "1.0.0",
+  "scripts": {
+    "generate-runtime-config": "node scripts/generate-runtime-config.js",
+    "build": "npm run generate-runtime-config"
+  },
   "devDependencies": {
     "render-cli": "^0.3.2",
     "vercel": "^58.5.1"

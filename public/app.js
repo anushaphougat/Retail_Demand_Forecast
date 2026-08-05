@@ -1,37 +1,47 @@
-const apiUrlInput = document.getElementById("apiUrl");
+const API_BASE_URL = (typeof window !== "undefined" && window.API_BASE_URL_OVERRIDE)
+  ? window.API_BASE_URL_OVERRIDE
+  : "http://127.0.0.1:8000";
 const storeIdInput = document.getElementById("storeId");
 const skuIdInput = document.getElementById("skuId");
 const horizonInput = document.getElementById("horizon");
 const fetchForecastBtn = document.getElementById("fetchForecast");
 const fetchTopMoversBtn = document.getElementById("fetchTopMovers");
 const statusMessage = document.getElementById("statusMessage");
-const forecastPanel = document.getElementById("forecastPanel");
 const topMoversPanel = document.getElementById("topMoversPanel");
 const forecastSummary = document.getElementById("forecastSummary");
 const topMoversSummary = document.getElementById("topMoversSummary");
 const forecastTable = document.getElementById("forecastTable");
 const forecastTableBody = forecastTable.querySelector("tbody");
 const topMoversTable = document.getElementById("topMoversTable").querySelector("tbody");
-
+const forecastPlaceholder = document.getElementById("forecastPlaceholder");
 const chartCanvas = document.getElementById("forecastChart");
 let chartInstance = null;
+let apiConnected = false;
 
-const savedApiUrl = localStorage.getItem("forecastApiUrl");
-if (savedApiUrl) {
-  apiUrlInput.value = savedApiUrl;
+async function checkApiConnection() {
+  setStatus("Checking local API connection...");
+  try {
+    const response = await fetch(`${API_BASE_URL}/health`);
+    if (!response.ok) {
+      throw new Error("API health endpoint returned an error");
+    }
+    apiConnected = true;
+    setStatus("Connected to local API.");
+    return true;
+  } catch (error) {
+    apiConnected = false;
+    setStatus("Local API unavailable at http://127.0.0.1:8000. Start the backend and retry.", true);
+    return false;
+  }
 }
 
 function getApiUrl() {
-  const value = apiUrlInput.value.trim();
-  if (value) {
-    return value.replace(/\/+$/, "");
-  }
-  return window.location.origin;
+  return API_BASE_URL;
 }
 
 function setStatus(text, error = false) {
   statusMessage.textContent = text;
-  statusMessage.style.color = error ? "#fda4af" : "#cbd5e1";
+  statusMessage.classList.toggle("status--error", error);
 }
 
 function ensurePanel(panel, visible) {
@@ -44,8 +54,9 @@ function formatDate(dateString) {
 }
 
 function renderForecastChart(labels, values, lower, upper) {
-  ensurePanel(forecastPanel, true);
+  ensurePanel(forecastTable.closest(".panel"), true);
   forecastTable.hidden = false;
+  forecastPlaceholder.hidden = true;
 
   if (chartInstance) {
     chartInstance.destroy();
@@ -59,27 +70,28 @@ function renderForecastChart(labels, values, lower, upper) {
         {
           label: "Predicted quantity",
           data: values,
-          borderColor: "#38bdf8",
-          backgroundColor: "rgba(56, 189, 248, 0.18)",
-          tension: 0.25,
-          pointRadius: 3,
+          borderColor: "#111111",
+          backgroundColor: "rgba(17, 17, 17, 0.08)",
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: "#111111",
           fill: true,
         },
         {
           label: "Lower 95%",
           data: lower,
-          borderColor: "#60a5fa",
+          borderColor: "#4b5563",
           borderDash: [6, 4],
-          tension: 0.25,
+          tension: 0.3,
           pointRadius: 0,
           fill: false,
         },
         {
           label: "Upper 95%",
           data: upper,
-          borderColor: "#818cf8",
+          borderColor: "#6b7280",
           borderDash: [6, 4],
-          tension: 0.25,
+          tension: 0.3,
           pointRadius: 0,
           fill: false,
         },
@@ -88,18 +100,25 @@ function renderForecastChart(labels, values, lower, upper) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: 450 },
       scales: {
         x: {
-          ticks: { color: "#cbd5e1" },
-          grid: { color: "rgba(148,163,184,0.12)" },
+          ticks: { color: "#111111" },
+          grid: { color: "rgba(17,24,39,0.08)" },
         },
         y: {
-          ticks: { color: "#cbd5e1" },
-          grid: { color: "rgba(148,163,184,0.12)" },
+          ticks: { color: "#111111" },
+          grid: { color: "rgba(17,24,39,0.08)" },
         },
       },
       plugins: {
-        legend: { labels: { color: "#e2e8f0" } },
+        legend: { labels: { color: "#111111" }, position: "top" },
+        tooltip: { mode: "index", intersect: false },
+      },
+      interaction: {
+        mode: "nearest",
+        axis: "x",
+        intersect: false,
       },
     },
   });
@@ -129,7 +148,7 @@ function renderTopMoversTable(rows, storeId) {
     `;
     topMoversTable.appendChild(tr);
   });
-  topMoversSummary.textContent = `Top movers for store ${storeId}`;
+  topMoversSummary.textContent = `Top movers for ${storeId}`;
   ensurePanel(topMoversPanel, true);
 }
 
@@ -144,9 +163,14 @@ async function fetchForecast() {
     return;
   }
 
-  localStorage.setItem("forecastApiUrl", apiUrl);
+  if (!apiConnected && !(await checkApiConnection())) {
+    return;
+  }
+
   setStatus("Requesting forecast...");
   ensurePanel(topMoversPanel, false);
+  forecastTable.hidden = true;
+  forecastPlaceholder.hidden = false;
 
   try {
     const response = await fetch(`${apiUrl}/forecast/${encodeURIComponent(storeId)}/${encodeURIComponent(skuId)}?horizon=${horizon}`);
@@ -156,7 +180,6 @@ async function fetchForecast() {
     }
 
     const payload = await response.json();
-
     const labels = payload.forecasts.map((item) => formatDate(item.forecast_date));
     const values = payload.forecasts.map((item) => item.predicted_qty);
     const lower = payload.forecasts.map((item) => item.lower_95);
@@ -164,11 +187,12 @@ async function fetchForecast() {
 
     renderForecastTable(payload.forecasts);
     renderForecastChart(labels, values, lower, upper);
-    forecastSummary.textContent = `Forecast for ${payload.store_id} / ${payload.sku_id} (${payload.horizon} days)`;
+    forecastSummary.textContent = `${payload.store_id} / ${payload.sku_id} forecasted over ${payload.horizon} days`;
     setStatus(`Forecast loaded successfully. Cached: ${payload.cached ? "yes" : "no"}.`);
   } catch (error) {
-    setStatus(`Failed to load forecast: ${error.message}` , true);
-    forecastPanel.hidden = true;
+    setStatus(`Failed to load forecast: ${error.message}`, true);
+    forecastTable.hidden = true;
+    forecastPlaceholder.hidden = false;
   }
 }
 
@@ -181,9 +205,12 @@ async function fetchTopMovers() {
     return;
   }
 
-  localStorage.setItem("forecastApiUrl", apiUrl);
+  if (!apiConnected && !(await checkApiConnection())) {
+    return;
+  }
+
   setStatus("Requesting top movers...");
-  ensurePanel(forecastPanel, false);
+  ensurePanel(forecastTable.closest(".panel"), false);
 
   try {
     const response = await fetch(`${apiUrl}/forecast/top-movers/${encodeURIComponent(storeId)}?days=7`);
@@ -200,5 +227,6 @@ async function fetchTopMovers() {
   }
 }
 
+document.addEventListener("DOMContentLoaded", checkApiConnection);
 fetchForecastBtn.addEventListener("click", fetchForecast);
 fetchTopMoversBtn.addEventListener("click", fetchTopMovers);
