@@ -1,8 +1,8 @@
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #ffffff;
+  color: #111111;
 }
 
 * {
@@ -12,137 +12,280 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at top, rgba(96, 165, 250, 0.14), transparent 32%),
-              radial-gradient(circle at 20% 10%, rgba(16, 185, 129, 0.12), transparent 28%),
-              #020617;
+  background: #ffffff;
 }
 
-header {
-  padding: 2rem 1.2rem 1rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+body::before {
+  display: none;
 }
 
-.brand h1 {
-  margin: 0;
-  font-size: clamp(1.8rem, 2.4vw, 2.8rem);
-}
-
-.brand p {
-  margin: 0.75rem 0 0;
-  color: #94a3b8;
-}
-
-main {
-  max-width: 1100px;
+header.hero {
+  padding: 3rem 1.5rem 1.5rem;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.hero-copy {
+  max-width: 680px;
+}
+
+.eyebrow {
+  color: #111111;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  margin: 0 0 0.75rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 4vw, 3.75rem);
+  line-height: 1.05;
+  color: #111111;
+}
+
+.hero-description {
+  margin: 1rem 0 0;
+  max-width: 42rem;
+  color: #333333;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  background: #f8f8f8;
+  border-radius: 1rem;
+  padding: 1rem 1.2rem;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111111;
+}
+
+.stat-label {
+  margin-top: 0.35rem;
+  color: #4b5563;
+  font-size: 0.92rem;
+}
+
+main.dashboard-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 3rem;
 }
 
 .panel {
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 18px;
-  box-shadow: 0 18px 60px rgba(15, 23, 42, 0.35);
-  padding: 1.75rem;
-  margin-bottom: 1.5rem;
+  background: #ffffff;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+  padding: 2rem;
+  margin-bottom: 1.75rem;
 }
 
+.panel--elevated::before {
+  display: none;
+}
+
+.panel-heading,
 .section-header {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
   flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.4rem;
 }
 
+.panel-heading h2,
+.section-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #111111;
+}
+
+.panel-description,
 .summary {
-  color: #60a5fa;
-  font-size: 0.95rem;
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.98rem;
+  line-height: 1.6;
 }
 
 .form-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
 }
 
 label {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-  color: #cbd5e1;
+  gap: 0.6rem;
+  color: #111111;
+  font-size: 0.96rem;
 }
 
 input {
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 12px;
-  padding: 0.85rem 1rem;
-  background: rgba(15, 23, 42, 0.78);
-  color: #f8fafc;
-  outline: none;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  background: #f8f8f8;
+  color: #111111;
+  box-shadow: inset 0 1px 2px rgba(17, 24, 39, 0.04);
+}
+
+input::placeholder {
+  color: rgba(17, 24, 39, 0.45);
 }
 
 input:focus {
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.12);
+  border-color: #111111;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.08);
 }
 
 .actions {
-  margin-top: 1.25rem;
   display: flex;
-  gap: 0.75rem;
   flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.75rem;
 }
 
 button {
-  border: none;
-  border-radius: 999px;
-  padding: 0.95rem 1.5rem;
-  background: linear-gradient(135deg, #2563eb, #38bdf8);
-  color: white;
-  font-weight: 600;
+  border: 1px solid #111111;
+  border-radius: 0.75rem;
+  padding: 0.95rem 1.6rem;
+  min-width: 160px;
+  background: #111111;
+  color: #ffffff;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 160ms ease, box-shadow 160ms ease;
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
 button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 32px rgba(56, 189, 248, 0.22);
+  background: #333333;
 }
 
 .status {
-  margin-top: 1rem;
-  color: #cbd5e1;
+  margin-top: 1.2rem;
+  padding: 1rem 1.1rem;
+  border-radius: 16px;
+  background: #f3f4f6;
+  border: 1px solid rgba(17, 24, 39, 0.1);
+  color: #111111;
+}
+
+.status--error {
+  color: #b91c1c;
+  border-color: rgba(220, 38, 38, 0.24);
+}
+
+.panel--split {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.5rem;
+}
+
+.left-card,
+.right-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-wrapper {
+  min-height: 380px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  padding: 1.3rem;
+}
+
+.table-container {
+  min-height: 320px;
+  display: grid;
+  gap: 1rem;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  border: 1px dashed rgba(17, 24, 39, 0.16);
+  border-radius: 16px;
+  color: #4b5563;
+  background: #f8f8f8;
+  text-align: center;
+  padding: 1.75rem;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.96rem;
 }
 
 .data-table th,
 .data-table td {
   text-align: left;
-  padding: 0.95rem 1rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-  font-size: 0.95rem;
+  padding: 1rem 1rem;
+  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
 }
 
 .data-table th {
-  color: #94a3b8;
+  color: #374151;
+  font-weight: 600;
 }
 
-footer {
-  padding: 1rem 1.2rem 2rem;
-  color: #94a3b8;
+.data-table tr:hover td {
+  background: rgba(17, 24, 39, 0.04);
+}
+
+.footer-bar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 2.5rem;
+  color: #4b5563;
   text-align: center;
 }
 
+@media (max-width: 980px) {
+  .hero-stats,
+  .panel--split {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
+  header.hero {
+    padding: 2rem 1rem 1rem;
+  }
+
+  main.dashboard-shell {
+    padding: 1rem;
+  }
+
   .panel {
-    padding: 1.25rem;
+    padding: 1.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
   }
 }
