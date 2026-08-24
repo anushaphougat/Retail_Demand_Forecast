@@ -20,8 +20,8 @@ let currentBatchSkuIdx = 0;
 
 // ── Chart palette ───────────────────────────────────────────────────────────
 const PALETTE = [
-  "#6c63ff", "#22c55e", "#f59e0b", "#ef4444",
-  "#06b6d4", "#ec4899", "#a78bfa", "#34d399",
+  "#111111", "#444444", "#777777", "#999999",
+  "#222222", "#555555", "#333333", "#666666",
 ];
 
 const CHART_DEFAULTS = {
@@ -30,21 +30,21 @@ const CHART_DEFAULTS = {
   animation: { duration: 400 },
   plugins: {
     legend: {
-      labels: { color: "#7b8199", font: { size: 12 }, boxWidth: 14 },
+      labels: { color: "#555555", font: { size: 12 }, boxWidth: 14 },
       position: "top",
     },
-    tooltip: { mode: "index", intersect: false, backgroundColor: "#181c27",
-      titleColor: "#e8eaf0", bodyColor: "#7b8199", borderColor: "#ffffff14",
+    tooltip: { mode: "index", intersect: false, backgroundColor: "#111111",
+      titleColor: "#ffffff", bodyColor: "#aaaaaa", borderColor: "#333333",
       borderWidth: 1, padding: 10 },
   },
   scales: {
     x: {
-      ticks: { color: "#7b8199", font: { size: 11 } },
-      grid: { color: "rgba(255,255,255,0.05)" },
+      ticks: { color: "#777777", font: { size: 11 } },
+      grid: { color: "rgba(0,0,0,0.06)" },
     },
     y: {
-      ticks: { color: "#7b8199", font: { size: 11 } },
-      grid: { color: "rgba(255,255,255,0.05)" },
+      ticks: { color: "#777777", font: { size: 11 } },
+      grid: { color: "rgba(0,0,0,0.06)" },
     },
   },
   interaction: { mode: "nearest", axis: "x", intersect: false },
@@ -244,7 +244,7 @@ function renderForecast(payload) {
           label: "Upper 95%",
           data: upper,
           borderColor: "transparent",
-          backgroundColor: "rgba(108,99,255,0.10)",
+          backgroundColor: "rgba(17,17,17,0.07)",
           fill: "+1",
           pointRadius: 0,
           tension: 0.3,
@@ -252,11 +252,11 @@ function renderForecast(payload) {
         {
           label: "Predicted Qty",
           data: vals,
-          borderColor: "#6c63ff",
-          backgroundColor: "rgba(108,99,255,0.18)",
+          borderColor: "#111111",
+          backgroundColor: "rgba(17,17,17,0.10)",
           tension: 0.3,
           pointRadius: 3,
-          pointBackgroundColor: "#6c63ff",
+          pointBackgroundColor: "#111111",
           borderWidth: 2.5,
           fill: false,
         },
@@ -264,7 +264,7 @@ function renderForecast(payload) {
           label: "Lower 95%",
           data: lower,
           borderColor: "transparent",
-          backgroundColor: "rgba(108,99,255,0.10)",
+          backgroundColor: "rgba(17,17,17,0.07)",
           fill: "-1",
           pointRadius: 0,
           tension: 0.3,
@@ -486,12 +486,12 @@ function selectBatchSku(idx) {
       labels,
       datasets: [
         { label: "Upper 95%", data: upper, borderColor: "transparent",
-          backgroundColor: hexAlpha(color, 0.12), fill: "+1", pointRadius: 0, tension: 0.3 },
+          backgroundColor: "rgba(17,17,17,0.07)", fill: "+1", pointRadius: 0, tension: 0.3 },
         { label: res.sku_id, data: vals, borderColor: color,
-          backgroundColor: hexAlpha(color, 0.18), tension: 0.3, pointRadius: 3,
+          backgroundColor: "rgba(17,17,17,0.10)", tension: 0.3, pointRadius: 3,
           pointBackgroundColor: color, borderWidth: 2.5, fill: false },
         { label: "Lower 95%", data: lower, borderColor: "transparent",
-          backgroundColor: hexAlpha(color, 0.12), fill: "-1", pointRadius: 0, tension: 0.3 },
+          backgroundColor: "rgba(17,17,17,0.07)", fill: "-1", pointRadius: 0, tension: 0.3 },
       ],
     },
     options: { ...CHART_DEFAULTS },
