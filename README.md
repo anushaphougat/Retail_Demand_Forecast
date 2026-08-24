@@ -1,6 +1,7 @@
 ﻿# Retail Demand Forecast
 
 Retail Demand Forecast is a retail demand forecasting repository for SKU-level demand prediction across stores.
+Live deployed link- https://retail-demand-forecast-eight.vercel.app/
 
 It includes:
 
