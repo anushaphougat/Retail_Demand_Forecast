@@ -3,122 +3,328 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Retail Demand Forecast Dashboard</title>
+  <title>Retail Demand Forecast · Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <header class="hero">
-    <div class="hero-copy">
-      <p class="eyebrow">Retail Intelligence</p>
-      <h1>Demand Forecast Dashboard</h1>
-      <p class="hero-description">Explore SKU-level demand forecasts, review top movers, and use the local API for reliable inventory planning.</p>
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">📦</span>
+      <span class="brand-name">Demand<br/>Forecast</span>
     </div>
-    <div class="hero-stats">
-      <div class="stat-card">
-        <span class="stat-value">FastAPI</span>
-        <span class="stat-label">Backend service</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">Static UI</span>
-        <span class="stat-label">Vercel-ready</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">Predictive</span>
-        <span class="stat-label">SKU demand insights</span>
-      </div>
+    <ul class="sidebar-nav">
+      <li><a href="#" class="nav-item active" data-tab="overview">
+        <span class="nav-icon">🏠</span> Overview
+      </a></li>
+      <li><a href="#" class="nav-item" data-tab="forecast">
+        <span class="nav-icon">📈</span> SKU Forecast
+      </a></li>
+      <li><a href="#" class="nav-item" data-tab="topmovers">
+        <span class="nav-icon">🚀</span> Top Movers
+      </a></li>
+      <li><a href="#" class="nav-item" data-tab="batch">
+        <span class="nav-icon">📋</span> Batch Forecast
+      </a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <div class="api-status-dot" id="sidebarDot"></div>
+      <span id="sidebarStatusText">Connecting…</span>
     </div>
-  </header>
+  </nav>
 
-  <main class="dashboard-shell">
-    <section class="panel panel--elevated">
-      <div class="panel-heading">
-        <div>
-          <h2>Forecast Query</h2>
-          <p class="panel-description">Use the local API at <strong>http://127.0.0.1:8000</strong> to request SKU forecasts and top movers.</p>
+  <!-- ── Main ────────────────────────────────────────────────────────────── -->
+  <div class="main-wrapper">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">☰</button>
+      <div class="topbar-title" id="topbarTitle">Overview</div>
+      <div class="topbar-right">
+        <div class="health-badge" id="healthBadge">
+          <span class="badge-dot" id="badgeDot"></span>
+          <span id="badgeLabel">Checking…</span>
         </div>
+        <button class="btn btn--sm btn--ghost" id="refreshHealth" title="Refresh API health">⟳ Refresh</button>
       </div>
+    </header>
 
-      <div class="form-grid">
-        <label>
-          Store ID
-          <input id="storeId" type="text" placeholder="store_123" />
-        </label>
-        <label>
-          SKU ID
-          <input id="skuId" type="text" placeholder="sku_456" />
-        </label>
-        <label>
-          Horizon (days)
-          <input id="horizon" type="number" min="1" max="90" value="14" />
-        </label>
-      </div>
+    <main class="content" id="mainContent">
 
-      <div class="actions">
-        <button id="fetchForecast">Fetch Forecast</button>
-        <button id="fetchTopMovers">Fetch Top Movers</button>
-      </div>
-
-      <div id="statusMessage" class="status">Checking local API connection automatically.</div>
-    </section>
-
-    <section class="panel panel--split">
-      <div class="left-card panel--elevated">
-        <div class="section-header">
-          <h2>Forecast Results</h2>
-          <div id="forecastSummary" class="summary"></div>
+      <!-- ══════════ OVERVIEW TAB ═══════════════════════════════════════════ -->
+      <section class="tab-panel active" id="tab-overview">
+        <div class="page-header">
+          <h1>Dashboard Overview</h1>
+          <p class="page-subtitle">Real-time system status and key metrics for your retail demand forecasting pipeline.</p>
         </div>
-        <div class="chart-wrapper">
-          <canvas id="forecastChart"></canvas>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid" id="kpiGrid">
+          <div class="kpi-card">
+            <div class="kpi-icon">🔗</div>
+            <div class="kpi-content">
+              <div class="kpi-value" id="kpiApiStatus">—</div>
+              <div class="kpi-label">API Status</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🧠</div>
+            <div class="kpi-content">
+              <div class="kpi-value" id="kpiModel">—</div>
+              <div class="kpi-label">Model Loaded</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">⚡</div>
+            <div class="kpi-content">
+              <div class="kpi-value" id="kpiRedis">—</div>
+              <div class="kpi-label">Redis Cache</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-content">
+              <div class="kpi-value" id="kpiForecastRows">—</div>
+              <div class="kpi-label">Forecast Rows</div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="right-card panel--elevated">
-        <div class="section-header">
-          <h2>Forecast Table</h2>
-          <p class="summary">Detailed daily values for your selected SKU.</p>
+        <!-- API Config -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">API Configuration</h2>
+            <span class="card-badge">Connection</span>
+          </div>
+          <div class="form-row">
+            <label class="form-label">
+              API Base URL
+              <div class="input-group">
+                <input id="apiBaseUrlInput" type="text" class="input" placeholder="http://127.0.0.1:8000" />
+                <button class="btn btn--primary" id="applyApiUrl">Connect</button>
+              </div>
+            </label>
+          </div>
+          <div class="status-box" id="overviewStatus">Checking API connection automatically…</div>
         </div>
-        <div class="table-container">
-          <table id="forecastTable" class="data-table" hidden>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Predicted Qty</th>
-                <th>Lower 95%</th>
-                <th>Upper 95%</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div id="forecastPlaceholder" class="placeholder">Forecast results appear here after a successful query.</div>
+
+        <!-- Health Details -->
+        <div class="card" id="healthCard" style="display:none">
+          <div class="card-header">
+            <h2 class="card-title">Health Details</h2>
+            <span id="healthTimestamp" class="card-badge">—</span>
+          </div>
+          <div class="health-grid" id="healthDetails"></div>
         </div>
-      </div>
-    </section>
 
-    <section class="panel panel--elevated" id="topMoversPanel" hidden>
-      <div class="section-header">
-        <h2>Top Movers</h2>
-        <div id="topMoversSummary" class="summary"></div>
-      </div>
-      <div class="table-container">
-        <table id="topMoversTable" class="data-table">
-          <thead>
-            <tr>
-              <th>SKU ID</th>
-              <th>Total Forecasted Quantity</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+        <!-- Quick links -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Quick Actions</h2>
+          </div>
+          <div class="quick-actions">
+            <button class="quick-btn" data-tab="forecast">📈 SKU Forecast</button>
+            <button class="quick-btn" data-tab="topmovers">🚀 Top Movers</button>
+            <button class="quick-btn" data-tab="batch">📋 Batch Forecast</button>
+            <button class="quick-btn" id="triggerRetrain">🔄 Trigger Retrain</button>
+            <button class="quick-btn" id="invalidateCache">🗑️ Invalidate Cache</button>
+          </div>
+        </div>
+      </section>
 
-  <footer class="footer-bar">
-    <p>Local dashboard running with the built-in API endpoint. Use the controls to inspect demand forecasts and top movers.</p>
-  </footer>
+      <!-- ══════════ FORECAST TAB ════════════════════════════════════════════ -->
+      <section class="tab-panel" id="tab-forecast">
+        <div class="page-header">
+          <h1>SKU Forecast</h1>
+          <p class="page-subtitle">View demand forecasts with 95% confidence intervals for a specific store and SKU.</p>
+        </div>
 
-  <!-- Optional runtime config: set window.API_BASE_URL_OVERRIDE to your deployed API URL -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Query Parameters</h2>
+          </div>
+          <div class="form-grid-3">
+            <label class="form-label">
+              Store ID
+              <input id="storeId" type="text" class="input" placeholder="store_123" />
+            </label>
+            <label class="form-label">
+              SKU ID
+              <input id="skuId" type="text" class="input" placeholder="sku_456" />
+            </label>
+            <label class="form-label">
+              Horizon (days)
+              <input id="horizon" type="number" class="input" min="1" max="90" value="14" />
+            </label>
+          </div>
+          <div class="actions">
+            <button class="btn btn--primary" id="fetchForecast">Fetch Forecast</button>
+            <button class="btn btn--ghost" id="clearForecast">Clear</button>
+          </div>
+          <div class="status-box" id="forecastStatus" style="display:none"></div>
+        </div>
+
+        <!-- Forecast Chart -->
+        <div class="card" id="forecastChartCard" style="display:none">
+          <div class="card-header">
+            <h2 class="card-title">Demand Forecast Chart</h2>
+            <div id="forecastSummaryBadge" class="card-badge">—</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="forecastChart"></canvas>
+          </div>
+          <div class="forecast-meta" id="forecastMeta"></div>
+        </div>
+
+        <!-- Forecast Table -->
+        <div class="card" id="forecastTableCard" style="display:none">
+          <div class="card-header">
+            <h2 class="card-title">Forecast Table</h2>
+            <button class="btn btn--sm btn--ghost" id="downloadCsv">⬇ Download CSV</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="forecastTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Predicted Qty</th>
+                  <th>Lower 95%</th>
+                  <th>Upper 95%</th>
+                  <th>Uncertainty Range</th>
+                </tr>
+              </thead>
+              <tbody id="forecastTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ TOP MOVERS TAB ══════════════════════════════════════════ -->
+      <section class="tab-panel" id="tab-topmovers">
+        <div class="page-header">
+          <h1>Top Movers</h1>
+          <p class="page-subtitle">Discover the top 10 highest-demand SKUs for a given store.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Query Parameters</h2>
+          </div>
+          <div class="form-grid-2">
+            <label class="form-label">
+              Store ID
+              <input id="tmStoreId" type="text" class="input" placeholder="store_123" />
+            </label>
+            <label class="form-label">
+              Days Window
+              <input id="tmDays" type="number" class="input" min="1" max="30" value="7" />
+            </label>
+          </div>
+          <div class="actions">
+            <button class="btn btn--primary" id="fetchTopMovers">Fetch Top Movers</button>
+          </div>
+          <div class="status-box" id="topMoversStatus" style="display:none"></div>
+        </div>
+
+        <div class="split-grid" id="topMoversResults" style="display:none">
+          <!-- Bar chart -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Demand Bar Chart</h2>
+              <div id="tmStoreBadge" class="card-badge">—</div>
+            </div>
+            <div class="chart-container chart-container--short">
+              <canvas id="topMoversChart"></canvas>
+            </div>
+          </div>
+          <!-- Table -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Ranking Table</h2>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="topMoversTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>SKU ID</th>
+                    <th>Total Forecasted Qty</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="topMoversTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ BATCH TAB ════════════════════════════════════════════════ -->
+      <section class="tab-panel" id="tab-batch">
+        <div class="page-header">
+          <h1>Batch Forecast</h1>
+          <p class="page-subtitle">Forecast multiple SKUs in one request. Enter up to 100 SKU IDs.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Batch Parameters</h2>
+          </div>
+          <div class="form-grid-2">
+            <label class="form-label">
+              Store ID
+              <input id="batchStoreId" type="text" class="input" placeholder="store_123" />
+            </label>
+            <label class="form-label">
+              Horizon (days)
+              <input id="batchHorizon" type="number" class="input" min="1" max="90" value="14" />
+            </label>
+          </div>
+          <label class="form-label" style="margin-top:1rem">
+            SKU IDs (one per line, max 100)
+            <textarea id="batchSkuIds" class="textarea" rows="6" placeholder="sku_001&#10;sku_002&#10;sku_003"></textarea>
+          </label>
+          <div class="actions">
+            <button class="btn btn--primary" id="runBatchForecast">Run Batch Forecast</button>
+            <button class="btn btn--ghost" id="downloadBatchCsv" style="display:none">⬇ Download CSV</button>
+          </div>
+          <div class="status-box" id="batchStatus" style="display:none"></div>
+        </div>
+
+        <div class="card" id="batchResultsCard" style="display:none">
+          <div class="card-header">
+            <h2 class="card-title">Batch Results</h2>
+            <div id="batchSummaryBadge" class="card-badge">—</div>
+          </div>
+          <div class="batch-sku-tabs" id="batchSkuTabs"></div>
+          <div class="chart-container" id="batchChartWrap" style="display:none">
+            <canvas id="batchChart"></canvas>
+          </div>
+          <div class="table-wrap" id="batchTableWrap" style="display:none">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Predicted Qty</th>
+                  <th>Lower 95%</th>
+                  <th>Upper 95%</th>
+                </tr>
+              </thead>
+              <tbody id="batchTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Optional runtime config -->
   <script src="/runtime-config.js"></script>
   <script src="/app.js"></script>
 </body>
